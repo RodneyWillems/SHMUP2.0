@@ -5,7 +5,7 @@ using UnityEngine;
 public class WithinBounds : MovingEnemy
 {
     // Start is called before the first frame update
-    private protected override void Start()
+    protected override void Start()
     {
         base.Start();
         m_direction = Vector2.right;
@@ -23,8 +23,7 @@ public class WithinBounds : MovingEnemy
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Moving()
     {
         // Screen wrapper
         float rightScreenEdge = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height)).x - 0.5f;
@@ -42,6 +41,16 @@ public class WithinBounds : MovingEnemy
         }
 
         m_rb.AddForce(m_direction * m_moveSpeed, ForceMode2D.Force);
-        SpeedControl();
+    }
+
+    // Update is called once per frame
+    protected override void Update()
+    {
+        base.Update();
+        if (m_inPosition)
+        {
+            Moving();
+            SpeedControl();
+        }
     }
 }
