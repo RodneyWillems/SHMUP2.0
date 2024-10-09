@@ -8,12 +8,13 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float m_health, m_movementSpeed;
     [SerializeField] private GameObject m_bulletSpawnPoint;
     [SerializeField] private GameObject m_bulletPrefab;
+    [SerializeField] private GameObject m_chargeEffect;
 
     // Player Controls
     private PlayerControls m_controls;
     private Coroutine m_shooting;
     private float m_baseCooldown;
-    private bool m_paused;
+    private bool m_paused, m_charged;
 
     // Miscellaneous
     private Rigidbody2D m_rb;
@@ -99,22 +100,32 @@ public class PlayerMovement : MonoBehaviour
     private void ChargeShot(InputAction.CallbackContext _context)
     {
         print("Charging my balls");
+        m_chargeEffect.SetActive(true);
     }
 
     private void OnPowerShoot(InputAction.CallbackContext _context)
     {
-        print("Powerful shot incoming");
+        print("Powerful shot charged");
+        m_charged = true;
         ActualStopCharging();
     }
 
     private void StopCharging(InputAction.CallbackContext _context)
     {
-        ActualStopCharging();
+        if (m_charged)
+        {
+            print("POWER SHOT GO BRRRRR");
+        }
+        else
+        {
+            ActualStopCharging();
+        }
     }
 
     private void ActualStopCharging()
     {
         print("NO");
+        m_chargeEffect.SetActive(false);
     }
 
     private void Moving()

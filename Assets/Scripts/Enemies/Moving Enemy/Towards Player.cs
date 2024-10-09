@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class TowardsPlayer : MovingEnemy
 {
-    // Start is called before the first frame update
-    protected override void Start()
+    protected override void Moving()
     {
-        base.Start();
-    }
-
-    // Update is called once per frame
-    protected override void Update()
-    {
-        base.Update();
+        base.Moving();
+        transform.position = Vector3.Lerp(transform.position, transform.position + Vector3.down, 1 * Time.deltaTime);
+        if (transform.position.y < -7)
+        {
+            Destroy(gameObject);
+        }
     }
 }

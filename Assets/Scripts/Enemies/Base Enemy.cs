@@ -27,4 +27,13 @@ public class BaseEnemy : MonoBehaviour
             }
         }
     }
+
+    protected virtual void Update()
+    {
+        if (!m_inPosition)
+        {
+            transform.position = Vector3.Lerp(transform.position, m_startPositon, 3 * Time.deltaTime);
+            m_inPosition = Vector3.Distance(transform.position, m_startPositon) <= 0.5f;
+        }
+    }
 }
