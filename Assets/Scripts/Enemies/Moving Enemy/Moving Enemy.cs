@@ -59,6 +59,7 @@ public class MovingEnemy : BaseEnemy
 
     protected override void Update()
     {
+        base.Update();
         if(m_inPosition)
         {
             Moving();

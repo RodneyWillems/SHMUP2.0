@@ -4,20 +4,32 @@ using UnityEngine;
 
 public class ShootPlayer : ShootingEnemy
 {
-    public float m_cooldown;
+    protected Transform m_player;
 
-    // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
+        m_player = FindObjectOfType<PlayerMovement>().transform;
     }
 
-    protected IEnumerator Shooting()
+    protected override IEnumerator Shooting()
     {
-        yield return new WaitForSeconds(m_cooldown);
+        while (true)
+        {
+            Vector3 playerPosition = m_player.position;
+            playerPosition.z = 0;
+
+            Vector3 myPos = transform.position;
+            playerPosition.x = playerPosition.x - myPos.x;
+            playerPosition.y = playerPosition.y - myPos.y;
+
+            float angle = Mathf.Atan2(playerPosition.y, playerPosition.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
+            m_shotDirection = transform.forward;
+            return base.Shooting();
+        }
     }
 
-    // Update is called once per frame
     protected override void Update()
     {
         base.Update();

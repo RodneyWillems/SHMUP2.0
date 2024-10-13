@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class TowardsDirection : ShootingEnemy
 {
-    // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
     }
 
-    // Update is called once per frame
+    protected override IEnumerator Shooting()
+    {
+        return base.Shooting();
+    }
+
     protected override void Update()
     {
         base.Update();

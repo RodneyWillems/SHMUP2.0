@@ -132,7 +132,6 @@ public class PlayerMovement : MonoBehaviour
     {
         // Movement logic
         Vector2 moveInput = m_controls.Default.Movement.ReadValue<Vector2>();
-
         m_rb.velocity = (moveInput * m_movementSpeed);
 
         // Screen wrapper
@@ -159,11 +158,6 @@ public class PlayerMovement : MonoBehaviour
             Vector2 limitedVel = flatVel.normalized * m_movementSpeed;
             m_rb.velocity = new Vector2(limitedVel.x, m_rb.velocity.y);
         }
-    }
-
-    void Update()
-    {
-
     }
 
     private void FixedUpdate()
