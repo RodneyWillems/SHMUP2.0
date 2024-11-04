@@ -10,6 +10,7 @@ public class MovingEnemy : BaseEnemy
 
     protected Rigidbody2D m_rb;
 
+    protected ShootingEnemy m_otherScript;
     protected override void Start()
     {
         base.Start();
@@ -23,6 +24,7 @@ public class MovingEnemy : BaseEnemy
         {
             m_direction = Vector2.right;
         }
+        m_otherScript = GetComponent<ShootingEnemy>();
     }
 
     protected virtual void Moving()
@@ -43,6 +45,7 @@ public class MovingEnemy : BaseEnemy
         }
 
         m_rb.AddForce(m_direction * m_moveSpeed, ForceMode2D.Force);
+        transform.up = -m_direction;
     }
 
     protected virtual void SpeedControl()
@@ -60,10 +63,21 @@ public class MovingEnemy : BaseEnemy
     protected override void Update()
     {
         base.Update();
-        if(m_inPosition)
+        if (m_otherScript == null)
         {
-            Moving();
-            SpeedControl();
+            if (m_inPosition)
+            {
+                Moving();
+                SpeedControl();
+            }
+        }
+        else
+        {
+            if (m_otherScript.m_inPosition)
+            {
+                Moving();
+                SpeedControl();
+            }
         }
     }
 }
