@@ -5,9 +5,14 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [SerializeField] private float m_health, m_movementSpeed;
+    #region Variables
+    [Header("Ship")]
+    [SerializeField] private GameObject[] m_damageParts;
+    [SerializeField] private int m_health, m_movementSpeed;
+
+    [Header("Shooting")]
     [SerializeField] private GameObject m_bulletSpawnPoint;
-    [SerializeField] private GameObject m_bulletPrefab;
+    [SerializeField] private GameObject m_bulletPrefab, m_powerPrefab;
     [SerializeField] private GameObject m_chargeEffect;
 
     // Player Controls
@@ -15,26 +20,45 @@ public class PlayerMovement : MonoBehaviour
     private Coroutine m_shooting;
     private float m_baseCooldown;
     private bool m_paused, m_charged;
+    private Coroutine m_iFrames;
 
     // Miscellaneous
     private Rigidbody2D m_rb;
     private Animator m_animator;
 
+    #endregion
+
+    #region Controls
     private void Awake()
     {
-        // Enabling all controls
+        // Setting all controls
         m_controls = new PlayerControls();
         m_controls.Default.Pause.started += OnPause;
-        m_controls.Default.Pause.Enable();
         m_controls.Default.Shoot.started += StartShoot;
         m_controls.Default.Shoot.canceled += StopShoot;
-        m_controls.Default.Shoot.Enable();
         m_controls.Default.PowerShoot.started += ChargeShot;
         m_controls.Default.PowerShoot.performed += OnPowerShoot;
         m_controls.Default.PowerShoot.canceled += StopCharging;
+    }
+
+    private void OnEnable()
+    {
+        // Enabling all controls
+        m_controls.Default.Shoot.Enable();
+        m_controls.Default.Pause.Enable();
         m_controls.Default.PowerShoot.Enable();
         m_controls.Default.Movement.Enable();
     }
+
+    private void OnDisable()
+    {
+        // Enabling all controls
+        m_controls.Default.Shoot.Disable();
+        m_controls.Default.Pause.Disable();
+        m_controls.Default.PowerShoot.Disable();
+        m_controls.Default.Movement.Disable();
+    }
+    #endregion
 
     void Start()
     {
@@ -42,8 +66,16 @@ public class PlayerMovement : MonoBehaviour
         m_animator = GetComponent<Animator>();
 
         m_baseCooldown = 0.3f;
+
+        foreach (GameObject go in m_damageParts)
+        {
+            go.SetActive(false);
+        }
+
+        m_iFrames = null;
     }
 
+    #region Damage
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.transform.CompareTag("Enemy"))
@@ -54,11 +86,37 @@ public class PlayerMovement : MonoBehaviour
 
     private void TakeDamage()
     {
-        m_health--;
-        print("Oh no!");
-        //m_animator.Play("Hit");
+        if (m_iFrames == null)
+        {
+            m_health--;
+            m_damageParts[m_health].SetActive(true);
+            m_iFrames = StartCoroutine(IFrames());
+        }
     }
 
+    private IEnumerator IFrames()
+    {
+        if (m_health <= 0)
+        {
+            Destroy(gameObject);
+        }
+        for (int i = 0; i < 15; i++)
+        {
+            GetComponentInChildren<SpriteRenderer>().enabled = !GetComponentInChildren<SpriteRenderer>().enabled;
+            float time = 0;
+            yield return new WaitUntil(() =>
+            {
+                time += Time.deltaTime;
+                return time >= 0.1f;
+            });
+        }
+        GetComponentInChildren<SpriteRenderer>().enabled = true;
+        m_iFrames = null;
+        yield return null;
+    }
+    #endregion
+
+    #region Inputs
     private void OnPause(InputAction.CallbackContext _context)
     {
         print("Pausing");
@@ -89,17 +147,20 @@ public class PlayerMovement : MonoBehaviour
     {
         while (true)
         {
-            GameObject newBullet = Instantiate(m_bulletPrefab, transform.position + Vector3.up, Quaternion.identity);
-            newBullet.tag = transform.tag;
-            newBullet.GetComponent<Rigidbody2D>().velocity = Vector2.up * 10;
-            Destroy(newBullet, 3);
+            if (m_iFrames == null)
+            {
+                GameObject newBullet = Instantiate(m_bulletPrefab, m_bulletSpawnPoint.transform.position, Quaternion.identity);
+                newBullet.tag = transform.tag;
+                newBullet.layer = gameObject.layer;
+                newBullet.GetComponent<Rigidbody2D>().velocity = Vector2.up * 10;
+                Destroy(newBullet, 3);
+            }
             yield return new WaitForSeconds(m_baseCooldown);
         }
     }
 
     private void ChargeShot(InputAction.CallbackContext _context)
     {
-        print("Charging my balls");
         m_chargeEffect.SetActive(true);
     }
 
@@ -114,7 +175,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (m_charged)
         {
-            print("POWER SHOT GO BRRRRR");
+            for (int i = 0; i < 20; i++)
+            {
+                GameObject powerShot = Instantiate(m_powerPrefab, new Vector3(-8 + i, -1.85f), Quaternion.identity);
+                powerShot.layer = gameObject.layer;
+                powerShot.GetComponent<Rigidbody2D>().velocity = Vector2.up * 20;
+                Destroy(powerShot, 0.5f);
+                m_charged = false;
+            }
         }
         else
         {
@@ -127,7 +195,9 @@ public class PlayerMovement : MonoBehaviour
         print("NO");
         m_chargeEffect.SetActive(false);
     }
+    #endregion
 
+    #region Movement
     private void Moving()
     {
         // Movement logic
@@ -165,4 +235,5 @@ public class PlayerMovement : MonoBehaviour
         Moving();
         SpeedControl();
     }
+    #endregion
 }
