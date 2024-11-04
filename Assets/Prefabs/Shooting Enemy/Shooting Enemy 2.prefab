@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 534573978130372410}
   - component: {fileID: 5433785413934452934}
   - component: {fileID: 4176911312359540662}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Shooting Enemy 2
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -168,7 +168,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2712773263117642269}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Bullet Spawnpoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
