@@ -22,9 +22,11 @@ public class ShootingEnemy : BaseEnemy
 
     protected virtual IEnumerator Shooting()
     {
-        print("Enemy is shooting !");
         GameObject bullet = Instantiate(m_bulletPrefab, m_bulletSpawnPoint.position, Quaternion.identity);
-        bullet.GetComponent<Rigidbody2D>().velocity = m_shotDirection * 10;
+        bullet.GetComponent<Rigidbody2D>().velocity = new Vector2(m_shotDirection.x, m_shotDirection.y).normalized * 10;
+        bullet.transform.up = m_shotDirection;
+        bullet.tag = transform.tag;
+        bullet.layer = gameObject.layer;
         Destroy(bullet, 3);
         yield return new WaitForSeconds(m_cooldown);
     }

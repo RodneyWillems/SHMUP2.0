@@ -11,7 +11,10 @@ public class TowardsDirection : ShootingEnemy
 
     protected override IEnumerator Shooting()
     {
-        return base.Shooting();
+        while (true)
+        {
+            yield return base.Shooting();
+        }
     }
 
     protected override void Update()
